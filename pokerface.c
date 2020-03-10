@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <ctype.h>
+#include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -28,6 +30,14 @@
 // 1101 Q
 // 1110 K
 // 1111 A
+
+#define RANK_J 0xc
+#define RANK_Q 0xd
+#define RANK_k 0xe
+#define RANK_A 0xf
+
+#define INVALID_CARD 0x0
+#define INVALID_SUIT 0x4
 
 typedef uint8_t card_t;
 typedef uint8_t rank_t;
@@ -102,3 +112,82 @@ hand_card2 (hand_t h)
   return h & 0xf;
 }
 
+rank_t
+parse_rank (char r)
+{
+  if (tolower(r) == 'k')
+    return RANK_K;
+  else if (tolower(r) == 'j')
+    return RANK_J;
+  else if (tolower(r) == 'q')
+    return RANK_Q;
+  else if (tolower(r) == 'a')
+    return RANK_A;
+  else if ((r - '0') >= 2 && (r - '0' <= 10))
+    return r - '0';
+
+  return INVALID_RANK;
+}
+
+suit_t
+parse_suit (char s)
+{
+  if (tolower(s) == 'd')
+    return SUIT_D;
+  else if (tolower (s) == 's')
+    return SUIT_S;
+  else if (tolower (s) == 'h')
+    return SUIT_H;
+  else if (tolower (s) == 'c')
+    return SUIT_C;
+
+  return INVALID_SUIT;
+}
+
+card_t
+parse_card (char *s)
+{
+  rank_t r = parse_rank (s[0]);
+  suit_t s = parse_suit (s[1]);
+
+  return make_card (r, s);
+}
+
+hand_t
+parse_hand (char *s)
+{
+  if (strlen (s) != 4)
+    goto invalid_hand;
+
+  card_t c1, c2;
+
+  c1 = parse_card (s);
+  c2 = parse_card (s+2);
+  if (card_invalid_p (c1) || card_invalid_p (c2))
+    goto invalid_hand;
+
+  return make_hand (c1, c2);
+
+ invalid_hand:
+  fprintf (stderr, "invalid hand\n");
+  exit (EXIT_FAILURE);
+}
+
+// There is a single argument of 4 chars to the program
+// Which is the hand of the player
+// The string can look like:
+// 4D2S - a 4 of diamonds and a 2 of spades
+// ASJS - an ace and a joker of spades
+int
+main (int argc, char *argv[])
+{
+  if (argc != 2)
+    {
+      fprintf (stderr, "usage: pokerface <hand>\n");
+      exit (EXIT_FAILURE);
+    }
+
+  hand_t h = parse_hand (argv[1]);
+  
+  return 0;
+}
