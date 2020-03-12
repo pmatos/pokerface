@@ -3,6 +3,10 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <wchar.h>
+#include <locale.h>
+#include <string.h>
+#include <openssl/rand.h>
 
 // A deck of cards is represented by 52 uint8_t.
 // The suit is represented by the bottom 2 bits.
@@ -33,10 +37,24 @@
 
 #define RANK_J 0xc
 #define RANK_Q 0xd
-#define RANK_k 0xe
+#define RANK_K 0xe
 #define RANK_A 0xf
+#define RANK_MASK 0x3c
+#define RANK_SHIFT 0x2
 
-#define INVALID_CARD 0x0
+#define SUIT_H 0x0
+#define SUIT_D 0x1
+#define SUIT_S 0x2
+#define SUIT_C 0x3
+#define SUIT_MASK 0x3
+#define SUIT_SHIFT 0x0
+
+#define USUIT_H L'\x2665'
+#define USUIT_S L'\x2660'
+#define USUIT_C L'\x2663'
+#define USUIT_D L'\x2666'
+
+#define INVALID_RANK 0x0
 #define INVALID_SUIT 0x4
 
 typedef uint8_t card_t;
@@ -84,14 +102,14 @@ card_black_p (card_t c)
   return (c & 0x2) == 1;
 }
 
-inline bool
+bool
 card_invalid_p (card_t c)
 {
   uint8_t v = c >> 2;
   return v == 0x0 || v == 0x1 || v == 0xb || v > 0xf;
 }
 
-inline hand_t
+hand_t
 make_hand (card_t c1, card_t c2)
 {
   if (c1 < c2)
@@ -145,12 +163,18 @@ parse_suit (char s)
 }
 
 card_t
+make_card (rank_t r, suit_t s)
+{
+  return (r << RANK_SHIFT) | (s << SUIT_SHIFT);
+}
+
+card_t
 parse_card (char *s)
 {
   rank_t r = parse_rank (s[0]);
-  suit_t s = parse_suit (s[1]);
+  suit_t st = parse_suit (s[1]);
 
-  return make_card (r, s);
+  return make_card (r, st);
 }
 
 hand_t
@@ -173,6 +197,25 @@ parse_hand (char *s)
   exit (EXIT_FAILURE);
 }
 
+card_t
+random_card (void)
+{
+  card_t buf;
+  RAND_bytes (&buf, 1);
+  return card_invalid_p (buf) ? random_card () : buf;
+}
+
+// Evaluate hand
+// The magic happens here
+void
+evaluate (hand_t h)
+{
+  // hand h is your hand, and you are playing against one other player
+  // Get 5 cards randomly for the table and another playerson a loop.
+  // Present probabilities of getting each of the poker hands and winning
+  // the hand.
+}
+
 // There is a single argument of 4 chars to the program
 // Which is the hand of the player
 // The string can look like:
@@ -187,7 +230,9 @@ main (int argc, char *argv[])
       exit (EXIT_FAILURE);
     }
 
+  setlocale (LC_ALL, "en_US.UTF-8");
   hand_t h = parse_hand (argv[1]);
-  
+
+  wprintf ( L"%lc\n", USUIT_H);
   return 0;
 }
