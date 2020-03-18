@@ -205,6 +205,68 @@ random_card (void)
   return card_invalid_p (buf) ? random_card () : buf;
 }
 
+bool
+royal_flush_p (hand_t h, card_t *cs, size_t n)
+{
+
+}
+
+bool
+straight_flush_p (hand_t h, card_t *cs, size_t n)
+{
+
+}
+
+bool
+four_of_a_kind_p (hand_t h, card_t *cs, size_t n)
+{
+
+}
+
+bool
+full_house_p (hand_t h, card_t *cs, size_t n)
+{
+
+}
+
+bool
+flush_p (hand_t h, card_t *cs, size_t n)
+{
+
+}
+
+bool
+straight_p (hand_t h, card_t *cs, size_t n)
+{
+
+}
+
+bool
+three_of_a_kind_p (hand_t h, card_t *cs, size_t n)
+{
+
+}
+
+bool
+two_pair_p (hand_t h, card_t *cs, size_t n)
+{
+
+}
+
+bool
+pair_p (hand_t h, card_t *cs, size_t n)
+{
+
+}
+
+// Compares two hands and returns 1, if hand2 is better than hand1,
+// 0 if they are the same and -1 otherwise.
+int
+compare (hand_t h1, hand_t h2, card_t *cs, size_t n)
+{
+
+}
+
 // Evaluate hand
 // The magic happens here
 void
@@ -230,7 +292,7 @@ main (int argc, char *argv[])
       exit (EXIT_FAILURE);
     }
 
-  setlocale (LC_ALL, "en_US.UTF-8");
+  setlocale (LC_ALL, "");
   hand_t h = parse_hand (argv[1]);
 
   wprintf ( L"%lc\n", USUIT_H);
